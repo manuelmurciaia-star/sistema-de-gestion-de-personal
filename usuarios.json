@@ -1,0 +1,22 @@
+[
+    {
+        "nombre": "Carlos",
+        "edad": 35,
+        "categoria": "Seguros de Vida"
+    },
+    {
+        "nombre": "Elena",
+        "edad": 28,
+        "categoria": "Seguros Autos"
+    },
+    {
+        "nombre": "Marina",
+        "edad": 33,
+        "categoria": "Seguros Hogar"
+    },
+    {
+        "nombre": "Pedro",
+        "edad": 38,
+        "categoria": "Inversiones"
+    }
+]
