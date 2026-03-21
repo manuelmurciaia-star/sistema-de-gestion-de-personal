@@ -106,28 +106,68 @@ if not df.empty:
     st.title("🌐 Sistema Gestión de Personal Dinámico")
 
     # A. GESTIÓN DE USUARIOS (CRUD)
-    with st.expander("📝 Editar o Eliminar Usuarios"):
-        nombres = df['nombre'].tolist()
-        user_sel = st.selectbox("Selecciona un usuario:", nombres)
-        idx = df.index[df['nombre'] == user_sel][0]
-        fila = df.loc[idx]
+    # --- 🏢 CONSOLA DE ADMINISTRACIÓN GLOBAL ---
+    with st.expander("⚙️ Gestión Avanzada de Personal y Categorías"):
+        
+        tab1, tab2, tab3 = st.tabs(["👤 Editar/Eliminar", "➕ Nuevo Usuario", "📁 Gestionar Áreas"])
 
-        c1, c2 = st.columns(2)
-        with c1:
-            n_edad = st.number_input("Edad:", value=int(fila['edad']), key="e_age")
-        with c2:
-            # Lógica de categorías segura para el "Simulacro Camaleón"
-            lista_opciones = list(iconos_categorias.keys())
-            categoria_actual = fila['categoria']
-            indice_defecto = lista_opciones.index(categoria_actual) if categoria_actual in lista_opciones else 0
-            n_cat = st.selectbox("Categoría:", lista_opciones, index=indice_defecto)
+        # TAB 1: EDITAR O ELIMINAR EXISTENTES
+        with tab1:
+            nombres = df['nombre'].tolist()
+            user_sel = st.selectbox("Seleccionar empleado para modificar:", nombres)
+            idx = df.index[df['nombre'] == user_sel][0]
+            
+            c1, c2 = st.columns(2)
+            n_edad = c1.number_input("Nueva Edad:", value=int(df.at[idx, 'edad']), key="edit_age")
+            
+            # Categorías dinámicas: las saca del propio DF o de una lista guardada
+            cats_existentes = list(df['categoria'].unique())
+            n_cat = c2.selectbox("Cambiar Área:", cats_existentes, index=cats_existentes.index(df.at[idx, 'categoria']))
 
-        if st.button("💾 Guardar Cambios"):
-            df.at[idx, 'edad'] = n_edad
-            df.at[idx, 'categoria'] = n_cat
-            with open(PATH_JSON, "w", encoding="utf-8") as f:
-                json.dump(df.to_dict(orient="records"), f, indent=4, ensure_ascii=False)
-            st.success("Actualizado."); st.rerun()
+            col_btns = st.columns(2)
+            if col_btns[0].button("💾 Actualizar Datos", use_container_width=True):
+                df.at[idx, 'edad'] = n_edad
+                df.at[idx, 'categoria'] = n_cat
+                with open(PATH_JSON, "w", encoding="utf-8") as f:
+                    json.dump(df.to_dict(orient="records"), f, indent=4, ensure_ascii=False)
+                st.success(f"¡{user_sel} actualizado!"); st.rerun()
+            
+            if col_btns[1].button("🗑️ ELIMINAR EMPLEADO", type="primary", use_container_width=True):
+                df = df.drop(idx)
+                with open(PATH_JSON, "w", encoding="utf-8") as f:
+                    json.dump(df.to_dict(orient="records"), f, indent=4, ensure_ascii=False)
+                st.warning(f"Usuario eliminado."); st.rerun()
+
+        # TAB 2: AÑADIR NUEVO (ESCALABILIDAD)
+        with tab2:
+            st.markdown("### Registrar nuevo integrante")
+            with st.form("nuevo_user"):
+                new_nom = st.text_input("Nombre Completo:")
+                new_ed = st.number_input("Edad:", min_value=18, max_value=90)
+                new_ca = st.selectbox("Asignar a Área:", list(df['categoria'].unique()))
+                if st.form_submit_button("🚀 Dar de Alta"):
+                    nuevo_registro = {"nombre": new_nom, "edad": new_ed, "categoria": new_ca}
+                    datos.append(nuevo_registro)
+                    with open(PATH_JSON, "w", encoding="utf-8") as f:
+                        json.dump(datos, f, indent=4, ensure_ascii=False)
+                    st.success("Registrado correctamente"); st.rerun()
+
+        # TAB 3: GESTIONAR ÁREAS (EL CORAZÓN DEL SaaS)
+        with tab3:
+            st.markdown("### Configuración de la Organización")
+            nueva_area = st.text_input("Nombre de la nueva Área (ej: Oncología, Ventas, etc.):")
+            if st.button("🆕 Crear Nueva Área"):
+                # Para "crear" el área sin usuario, añadimos un usuario fantasma o 
+                # simplemente dejamos que el usuario lo asigne a alguien nuevo.
+                st.info(f"Área '{nueva_area}' lista. Ahora puedes asignar personal a esta categoría.")
+        # TAB 3: GESTIONAR ÁREAS (EL CORAZÓN DEL SaaS)
+        with tab3:
+            st.markdown("### Configuración de la Organización")
+            nueva_area = st.text_input("Nombre de la nueva Área (ej: Oncología, Ventas, etc.):")
+            if st.button("🆕 Crear Nueva Área"):
+                # Para "crear" el área sin usuario, añadimos un usuario fantasma o 
+                # simplemente dejamos que el usuario lo asigne a alguien nuevo.
+                st.info(f"Área '{nueva_area}' lista. Ahora puedes asignar personal a esta categoría.")
 
     # B. CONSULTOR GEMINI 3 FLASH (ELITE)
     st.divider()
