@@ -142,7 +142,7 @@ if not df.empty:
         with tab2:
             st.markdown("### Registrar nuevo integrante")
             with st.form("nuevo_user"):
-                new_nom = st.text_input("Nombre Completo:")
+                new_nom = st.text_input("Nombre Completo:", key="input_nuevo_nombre")
                 new_ed = st.number_input("Edad:", min_value=18, max_value=90)
                 new_ca = st.selectbox("Asignar a Área:", list(df['categoria'].unique()))
                 if st.form_submit_button("🚀 Dar de Alta"):
@@ -152,22 +152,15 @@ if not df.empty:
                         json.dump(datos, f, indent=4, ensure_ascii=False)
                     st.success("Registrado correctamente"); st.rerun()
 
+    
         # TAB 3: GESTIONAR ÁREAS (EL CORAZÓN DEL SaaS)
         with tab3:
             st.markdown("### Configuración de la Organización")
-            nueva_area = st.text_input("Nombre de la nueva Área (ej: Oncología, Ventas, etc.):")
-            if st.button("🆕 Crear Nueva Área"):
-                # Para "crear" el área sin usuario, añadimos un usuario fantasma o 
-                # simplemente dejamos que el usuario lo asigne a alguien nuevo.
-                st.info(f"Área '{nueva_area}' lista. Ahora puedes asignar personal a esta categoría.")
-        # TAB 3: GESTIONAR ÁREAS (EL CORAZÓN DEL SaaS)
-        with tab3:
-            st.markdown("### Configuración de la Organización")
-            nueva_area = st.text_input("Nombre de la nueva Área (ej: Oncología, Ventas, etc.):")
-            if st.button("🆕 Crear Nueva Área"):
-                # Para "crear" el área sin usuario, añadimos un usuario fantasma o 
-                # simplemente dejamos que el usuario lo asigne a alguien nuevo.
-                st.info(f"Área '{nueva_area}' lista. Ahora puedes asignar personal a esta categoría.")
+            # Añadimos key="area_admin_input" para que sea único
+            nueva_area = st.text_input("Nombre de la nueva Área:", key="area_admin_input") 
+            if st.button("🆕 Crear Nueva Área", key="btn_crear_area"):
+                st.info(f"Área '{nueva_area}' lista para ser asignada.")
+
 
     # B. CONSULTOR GEMINI 3 FLASH (ELITE)
     st.divider()
