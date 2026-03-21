@@ -1,12 +1,5 @@
-<<<<<<< HEAD
 streamlit
 pandas
 plotly
 google-genai
-=======
-streamlit
-pandas
-plotly
-google-genai
->>>>>>> 7e97dfce0994766113de4d8a5e98b76be16fa0df
 requests
